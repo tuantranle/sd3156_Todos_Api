@@ -17,23 +17,13 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 - Configure `.env` file by creating a copy from `.env.sample`
-- Setup a postgres docker container
-```bash
-docker run -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=<your-preferred-one> -d postgres:14
-```
-- At `app` directory, run `alembic` migration command. Please make sure your postgres DB is ready and accessible. In case you want to use `SQLite` instead, please be sure to configure the `env.py` file in `alembic` folder to support `batch execution` since `SQLite` does not support `ALTER` command, which is needed to configure the foreign key and establish the indexes.
+- Dowload and install PostgreSQL from https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
+- Using DBEaver to connect postgre and create database with name as `fastapi`
+- At `app` directory, run `alembic` migration command. Please make sure your postgres DB is ready and accessible.
 ```bash
 # Migrate to latest revison
 alembic upgrade head
 
-# Dowgragde to specific revision
-alembic downgrade <revision_number>
-
-# Downgrade to base (revert all revisions)
-alembic downgrade base
-
-# Create new revision
-alembic revision -m <comment>
 ```
 - Run `uvicorn` web server from `app` directory (`reload` mode is for development purposes)
 ```bash

@@ -10,6 +10,7 @@ class UserModel(BaseModel):
     first_name: str
     last_name: str
     password: str
+    company_id: UUID
 
 class UserBaseModel(BaseModel):
     id: UUID
@@ -17,6 +18,7 @@ class UserBaseModel(BaseModel):
     email: str | None = None
     first_name: str
     last_name: str
+    company_id: UUID
     
     class Config:
         from_attributes = True

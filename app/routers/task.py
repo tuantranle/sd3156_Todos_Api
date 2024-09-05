@@ -1,5 +1,5 @@
 from uuid import UUID
-from fastapi import APIRouter, Response, status, Depends, Query
+from fastapi import APIRouter, Body, Response, status, Depends, Query
 from typing import List
 from database import get_db_context
 from schemas.task import TaskStatus
@@ -66,8 +66,6 @@ async def create_task(
 
     return TaskService.add_new_task(db, request)
 
-
-
 @router.put("/{task_id}", status_code=status.HTTP_200_OK, response_model=TaskViewModel)
 async def update_task(
         task_id: UUID,
@@ -76,6 +74,24 @@ async def update_task(
     ):
     
     return TaskService.update_task(db, task_id, request)
+
+@router.patch("/{task_id}/assign", response_model=TaskViewModel)
+async def assign_task(
+        task_id: UUID,
+        new_owner_id: UUID,
+        db: Session = Depends(get_db_context),
+        user: User = Depends(AuthService.token_interceptor),
+    ):
+    task = TaskService.get_task_by_id(db, task_id)
+    
+    if task is None:
+        raise ResourceNotFoundError()
+
+    if task.owner_id != user.id and not user.is_admin:
+        raise AccessDeniedError()
+
+    updated_task = TaskService.assign_task(db, task_id, new_owner_id)
+    return updated_task
 
 @router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_task(

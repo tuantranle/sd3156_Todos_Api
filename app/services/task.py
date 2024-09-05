@@ -123,6 +123,30 @@ def update_task(db: Session, id: UUID, data: TaskModel) -> Task:
     
     return task
 
+def assign_task(db: Session, task_id: UUID, new_owner_id: UUID) -> Task:
+    # Retrieve the existing task
+    task = get_task_by_id(db, id)
+
+    # Validate that the task exists
+    if task is None:
+        raise ResourceNotFoundError(f"Task with ID {id} not found.")
+    
+    # Validate the new owner
+    new_owner = UserService.get_user_by_id(new_owner_id)
+    if new_owner is None:
+        raise InvalidInputError("New owner not found.")
+
+    # Update the task's owner
+    task.owner_id = new_owner_id
+    task.updated_at = get_current_utc_time()  # Update the timestamp
+
+    
+    # Commit the transaction
+    db.commit()
+    db.refresh(task)
+    
+    return task
+
 def delete_task(db: Session, task_id: UUID) -> None:
     # Fetch the task from the database
     task = db.query(Task).filter(Task.id == task_id).first()

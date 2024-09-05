@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Boolean, Column, String, Uuid
+from sqlalchemy import Boolean, Column, ForeignKey, String, Uuid
 from database import Base
 from .base_entity import BaseEntity
 from passlib.context import CryptContext
@@ -11,10 +11,12 @@ class User(BaseEntity, Base):
     __tablename__ = "users"
 
     id = Column(Uuid, primary_key=True, default=uuid.uuid4)
+    email = Column(String, unique=True, index=True)
     username = Column(String, unique=True, index=True)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     hashed_password = Column(String, nullable=False)
+    company_id = Column(Uuid, ForeignKey("companies.id"), nullable=True)
     is_active = Column(Boolean, default=True)
     is_admin = Column(Boolean, default=False)
     
